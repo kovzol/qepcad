@@ -23,6 +23,6 @@ Word FTYPEINFO(Word A)
     return TRUE;
   if (FIRST(A) == FALSE)
     return FALSE;
-  
+  return 0;
 }
       

@@ -27,6 +27,7 @@ Word LDCOEFMASK(Word c, Word P, Word J)
 Step1: /* Set up A to be a characteristic vector for the set of
 level 2 proj fac's whose leading coefficients vanish in c. */
   P_2 = LELTI(P,2);
+  if (P_2 == NIL) { A = NULL; v = NIL; goto Return; }
   n = THIRD(LELTI(LAST(P_2),PO_LABEL));
   A = GETARRAY(n + 1);
   for(i = 1; i <= n; i++)
@@ -72,7 +73,7 @@ Step5: /* Create the vector itself! */
   v = INV(v);
 
 Return: /* Prepare to return. */
-  FREEARRAY(A);
+  if (A != NULL) FREEARRAY(A);
   return v;
 }
 

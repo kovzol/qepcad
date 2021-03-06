@@ -5,19 +5,35 @@
 # This simply calls qepcad's make, and the master-make for the
 # extensions.
 ##################################################################
-SHELL = /bin/csh
+SHELL = /bin/bash
 MAKE       =  make  # You must use gmake, but it may not be
                     # called gmake on your system, so change this
 
 CCo        =  g++
-FLAGSo = -O4
+FLAGSo = -O4 -D__CORRECT_ISO_CPP_STRINGS_H_PROTO -fPIC
 
 CCd        =  g++
 FLAGSd = -g
 
+SUBMAKEFLAGS = -j1
+
 MFlags	= "CCo=${CCo}" "FLAGSo=${FLAGSo}"\
           "CCd=${CCd}" "FLAGSd=${FLAGSd}"\
-          "MAKE=${MAKE}"
+          "MAKE=${MAKE}"\
+	  "SUBMAKEFLAGS=${SUBMAKEFLAGS}"
+MFlags += -j1
+
+ifeq ($(OS),Windows_NT)
+    ARFLAGS :=
+else
+    UNAME_S := $(shell uname -s)
+    ifeq ($(UNAME_S),Linux)
+        ARFLAGS := crvU
+    endif
+    ifeq ($(UNAME_S),Darwin)
+        ARFLAGS := crv
+    endif
+endif
 
 both:   opt deb
 

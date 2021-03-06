@@ -18,6 +18,8 @@ void VERTFILL2D(Word D);
 void PASSLINE(Word D, Word F, Word P);
 void CADTVNEG(Word D);
 void CADTVSUPINF(Word D, Word k, Word dir);
+Word numberOfFullDimensionalCells(Word C);
+Word CADNUMLEAFCELLS(Word D);
 
 void QepcadCls::USERINT(Word P, Word W)
 {
@@ -288,6 +290,56 @@ Step2: /* Process the command. */
 	 goto Return;
 	 break;
 
+       case 106:
+	 SWRITE("Number of full-dimensional cells is \n");
+	 IWRITE(numberOfFullDimensionalCells(GVPC));
+	 SWRITE("\n");
+	 break;
+
+       case 107:
+	 if (!PCTRACKUNSATCORE) {
+	   SWRITE("ERROR! Unsat core tracking not enabled!\n");
+	   SWRITE("Must give track-unsat-core command prior to lifting.\n"); }
+	 else if (LELTI(GVPC,TRUTH) != FALSE)
+	   SWRITE("ERROR! Input formula is not unsatisfiable.");
+	 else
+	 {
+	   SWRITE("[ ");
+	   UNSATCORE.findUnsatCore();
+	   SWRITE(" ]\n");
+	 }
+	 break;
+	 
+       case 108:
+	 if (!PCTRACKUNSATCORE) {
+	   SWRITE("ERROR! Unsat core tracking not enabled!\n");
+	   SWRITE("Must give track-unsat-core command prior to lifting.\n"); }
+	 else if (LELTI(GVPC,TRUTH) != FALSE)
+	 {
+	   SWRITE("ERROR! Input formula is not unsatisfiable.");
+	 }
+	 else
+	 {
+	   SWRITE("[ ");
+	   UNSATCORE.findUnsatCore(true);
+	   SWRITE(" ]\n");
+	 }
+	 break;
+
+       case 109:
+	 if (UNSATCORE.isApplicable())
+	   PCTRACKUNSATCORE = TRUE;
+	 else
+	 {
+	   SWRITE("ERROR! unsat-core not applicable for this input!\n");
+	 }
+	 break;
+
+       case 110: {
+	 SWRITE("Number of leaf cells = ");
+	 IWRITE(CADNUMLEAFCELLS(GVPC));
+	 SWRITE("\n");
+       } break;
        }
        goto Step1;
 
@@ -344,6 +396,15 @@ void CADTVSUPINF(Word D, Word k, Word dir)
     if (m != 0)
       SLELTI(m,TRUTH,TRUE);
   }
+}
+
+Word CADNUMLEAFCELLS(Word D)
+{
+  Word CD = LELTI(D,CHILD);
+  Word count = CD == NIL ? 1 : 0;
+  for(Word L = CD; L != NIL; L = RED(L))
+    count += CADNUMLEAFCELLS(FIRST(L));
+  return count;  
 }
 
 void CADTVNEG(Word D)
@@ -541,4 +602,25 @@ void PASSLINE(Word D, Word F, Word P)
 
     Lp = RED(Lp);
   }
+}
+
+/*
+numberOfFullDimensionalCells
+Input : C a cell 
+Output: N the number of full-dimensional cells descended
+        from C.  Note: a lower-level cell with no
+        children is treated as a full-dimensional cell.
+ */
+Word numberOfFullDimensionalCells(Word C)
+{
+  Word N = 0;
+  Word S = LELTI(C,CHILD);
+  if (S == NIL) return 1;
+  while(S != NIL)
+  {
+    N += numberOfFullDimensionalCells(FIRST(S));
+    S = RED(S);
+    if (S != NIL) { S = RED(S); }
+  }
+  return N;
 }

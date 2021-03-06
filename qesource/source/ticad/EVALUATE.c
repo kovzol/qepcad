@@ -47,6 +47,22 @@ Step2: /* Evaluate the truth of the children of c */
 	 if (t == UNDET)
 	   t = QFFTEV(F,cs,k + 1);
 
+	 /*** UNSATCORE bookkeeping ***/
+	 if (t == FALSE && PCTRACKUNSATCORE)
+	 {
+	   // NOTE: if cs is a section and the quantifier associated with its
+	   //       level is F, then we should not track this cell.
+	   // NOTE: if there is an equational constraint at this level and cs
+	   //       is not a section or not a section of the constraint then we
+	   //       have to work backwards to find which atoms the constraints
+	   //       come from and that's what will have to be recorded.
+	   //       THIS IS YET TO BE DONE!!!!
+	   Word level_cs = LELTI(cs,LEVEL);
+	   Word associated_Q = LELTI(GVQ,level_cs);
+	   if (!( associated_Q == FULLDE && LAST(LELTI(cs,INDX)) % 2 == 0 ))
+	     UNSATCORE.record(cs);
+	 }
+	 /*****************************/
 
 	 /* Deal with the "Exist exactly k" operator!
 	  * If the quantifier-free part of the input formula
@@ -79,12 +95,20 @@ Step2: /* Evaluate the truth of the children of c */
 	   /* Remember witness cells for SAT problems. */
                                if (GVWL == -1) // Init GVWL the 1st time here
 			       { 
+				 /* Word T = GVQ;  */
+				 /* while(T != NIL && (FIRST(T) == EXIST ||  */
+				 /*                    FIRST(T) == FULLDE)) */
+				 /*   T = RED(T);  */
+				 /* GVWL = (T == NIL && GVNFV == 0) ? NIL : 0;  */
 				 Word T = GVQ; 
-				 while(T != NIL && FIRST(T) == EXIST) 
-				   T = RED(T); 
-				 GVWL = (T == NIL && GVNFV == 0) ? NIL : 0; 
+				 int elevel = 0;
+				 while(T != NIL && (FIRST(T) == EXIST || 
+				                    FIRST(T) == FULLDE))
+				 { T = RED(T); ++elevel; }
+				 GVWL = (GVNFV == 0 && elevel > 0) ? NIL : 0; 
+				 GVWLL = GVWL == 0 ? -1 : elevel;
 			       }
-			       if(GVWL != 0 && t == TRUE) 
+			       if(GVWL != 0 && t == TRUE && LELTI(cs,LEVEL) <= GVWLL) 
 			       { 
 				 GVWL = COMP(cs,GVWL); 
 			       }

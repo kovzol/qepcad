@@ -19,7 +19,7 @@ public:
 };
 
 static stack<OutputContext> OCS;
-ostream *currOut;
+ostream *currOut = &(std::cout);
 
 void PushOutputContext(ostream &out) 
 {
@@ -35,6 +35,11 @@ void PopOutputContext()
   currOut = OCS.top().pout;
   OPOS = OCS.top().OPOS;
   OCS.pop();
+}
+
+ostream& TopOutputContext()
+{
+  return *currOut;
 }
 
 void OutputContextInit(ostream& defaultout) 

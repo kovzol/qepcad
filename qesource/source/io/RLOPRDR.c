@@ -25,9 +25,6 @@ Step1: /* Read in. */
        else if (C == '/' && D == '=') { p = NEOP; }
        else
          {
-          char string[] = "P was the error.\n";
-          string[0] = C;
-          SWRITE(string);
          SWRITE("Error RLOPRDR: A relational operator was expected.\n");
          goto Step2;
          }

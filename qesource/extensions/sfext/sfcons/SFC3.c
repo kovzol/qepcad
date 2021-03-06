@@ -21,10 +21,8 @@ Note:  Right now, if there are cells of level n without truth value,
 void QepcadCls::SFC3(Word D, Word P, Word J, Word n, Word L)
 {
       Word t,SF,e,s,m,Dp,Pp,Lt,Lf,LA,Q,D1,P1,D0,P0,J0,i,Lp,pflag;
-
-	  // Please the Visual Studio Debugger...
-	  Pp = 0;
-	  Lt = 0;
+      Pp = 0; // required on Windows
+      Lt = 0; // required on Windows
 
 Step1: /* Space is either empty or R^n. */
       t = DOPFSUFF(P,LIST1(D));

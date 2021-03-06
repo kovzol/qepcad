@@ -42,7 +42,7 @@ EXTLIBS   =	${qe}/extensions/sfext/sfexto.a \
 		${qe}/extensions/adj2d/adj2do.a \
 		${qe}/extensions/rend/rendo.a \
 		${saclib}/lib/saclibo.a \
-		-lreadline \
+		-lreadline -lrt \
 		${SPECLFLAGS}
 
 
@@ -52,7 +52,7 @@ EXTLIBSD  =	${qe}/extensions/sfext/sfextd.a \
 		${qe}/extensions/adj2d/adj2dd.a \
 		${qe}/extensions/rend/rendd.a \
 		${saclib}/lib/saclibd.a \
-		-lreadline \
+		-lreadline -lrt \
 		${SPECLFLAGS}
 
 NAME      =  qepcad

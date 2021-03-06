@@ -157,6 +157,10 @@ Step1: /* Obtain coefficients. */
 	     SWRITE("a positive dimensional region equational constraints could be\n");
 	     SWRITE("invalid.  Switching to standard projection.\n");
 	   }
+	   /*
+	     In this case, we need to remove the constraints at this level in order to
+	     stop UDEQNCONST
+	    */
 	   P = PROJMCmod(r,A);
 	   goto Return;	   
 	 }

@@ -8,26 +8,30 @@
 static void SIGINT_handler(int i, siginfo_t *sip,void* uap);
 static void init_SIGINT_handler();
 #endif
+static int sendSignalAfterInterval(int seconds, int signum);
+extern int GVTIMEOUTLIMIT;
 
 /*====================================================================
                  main(argc,argv)
 
 Main Algorithm which drives the QEPCAD sytem. 
 ====================================================================*/
-int main(int argc, char **argv)
+int mainDUMMY(int argc, char **argv, void *topOfTheStack)
 {
        Word Fs,F_e,F_n,F_s,V,t,ac;
        char **av;
 
 Step1: /* Set up the system. */
        ARGSACLIB(argc,argv,&ac,&av);
-       BEGINSACLIB((Word *)&argc);
+       BEGINSACLIB((Word *)topOfTheStack);
        BEGINQEPCAD(ac,av);
-	   #ifndef _MSC_VER
+#ifndef _MSC_VER
        init_SIGINT_handler(); /* A special handler for SIGINT is needed
                                  to shut down child processes. Also used
 			         for SIGTERM. */
-       #endif
+#endif
+       if (GVTIMEOUTLIMIT > 0)
+	 sendSignalAfterInterval(GVTIMEOUTLIMIT,SIGALRM);
 
 Step2: /* Read input, create CAD, write result */
        PCCONTINUE = FALSE;
@@ -59,6 +63,8 @@ Return: /* Prepare for return. */
 #ifndef _MSC_VER
 static void SIGINT_handler(int i, siginfo_t *sip,void* uap)
 {  
+  if (sip->si_signo == SIGALRM)
+    FAIL("TIMEOUT","Exiting QEPCADB due to timeout");
   ENDQEPCAD(); // Kill child CAServer processes
   ENDSACLIB(SAC_FREEMEM);
   exit(1);
@@ -74,6 +80,41 @@ static void init_SIGINT_handler()
   p->sa_flags = SA_SIGINFO;
   sigaction(SIGINT,p,NULL);
   sigaction(SIGTERM,p,NULL);
+  sigaction(SIGALRM,p,NULL);
   free(p);
 }
 #endif
+
+static int sendSignalAfterInterval(int seconds, int signum)
+{
+#if defined (_MSC_VER) || defined(__APPLE__) // Timer support is missing on Windows/Mac
+  return 1;
+#else
+  /* Create timer */
+  timer_t timerid;
+  struct sigevent sev;
+  sev.sigev_notify = SIGEV_SIGNAL;
+  sev.sigev_signo = signum;
+  sev.sigev_value.sival_ptr = &timerid;
+  if (timer_create(CLOCK_MONOTONIC, &sev, &timerid) == -1)
+    return 1;
+
+  /* Start timer */
+  struct itimerspec its;
+  its.it_value.tv_sec = seconds;
+  its.it_value.tv_nsec = 0;
+  its.it_interval.tv_sec = its.it_value.tv_sec;
+  its.it_interval.tv_nsec = its.it_value.tv_nsec;
+  if (timer_settime(timerid, 0, &its, NULL) == -1)
+    return 2;
+
+  return 0;
+#endif
+}
+
+int main(int argc, char **argv)
+{
+  int dummy;
+  void *topOfTheStack = &dummy;
+  mainDUMMY(argc,argv,topOfTheStack);
+}

@@ -59,7 +59,7 @@ Step4: /* Propagate k-level factors. */
 	     L12 = LELTI(R12,PO_LABEL);
 	     t1 = MEMBER(L11,Ph);
 	     t2 = MEMBER(L12,Ph);
-	     if (t1 == t2) break;
+	     if (t1 == t2) continue; //8/2016: used to read "break;", which was a bug!
 	     if (t1 == 0) L3 = L11;
 	     else         L3 = L12;
 	     Chp = Ch;

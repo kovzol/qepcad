@@ -18,7 +18,7 @@ Outputs
 ======================================================================*/
 #include "saclib.h"
 
-Word AMUPRICSW(M,I,A,L_,Is_)
+void AMUPRICSW(M,I,A,L_,Is_)
 
        Word M,I,A;
        Word *L_,*Is_;

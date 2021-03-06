@@ -20,7 +20,7 @@ Propagate truth values.
 ======================================================================*/
 #include "qepcad.h"
 
-void PROPAGATE(Word D, Word c, Word k, Word f, Word Q)
+void QepcadCls::PROPAGATE(Word D, Word c, Word k, Word f, Word Q)
 {
        Word A0,A1,E0,E1,cp,k0,kp,q,C0;
        /* hide A0,A1,E0,E1,kp; */
@@ -44,7 +44,8 @@ Step2: /* Done? */
        if (LELTI(Q,kp + 1 - f) == CONTQ) {
 	 C0 = TCHILD4C(cp);
 	 if (C0 == TRUE || C0 == FALSE)
-	   { SLELTI(cp,TRUTH,C0); SLELTI(cp,HOWTV,BYPRP); goto Step8;}
+	 { SLELTI(cp,TRUTH,C0); SLELTI(cp,HOWTV,BYPRP); 
+	   goto Step8;}
 	 goto Return; }
        /* End "C" quantifier. */
 
@@ -52,7 +53,7 @@ Step2: /* Done? */
        if (LELTI(Q,kp + 1 - f) == FULLDE) {
 	 C0 = TCHILD4FDE(cp);
 	 if (C0 == TRUE || C0 == FALSE)
-	   { SLELTI(cp,TRUTH,C0); SLELTI(cp,HOWTV,BYPRP); goto Step8;}
+	 { SLELTI(cp,TRUTH,C0); SLELTI(cp,HOWTV,BYPRP); goto Step8;}
 	 goto Return; }
        /* End "F" quantifier. */
 
@@ -86,6 +87,8 @@ Step7: /* Fail to propagate. */
        goto Return;
 
 Step8: /* Prune. */
+       if (GVWL != 0 && LELTI(cp,TRUTH) && LELTI(cp,LEVEL) == GVWLL)
+       { GVWL = COMP(cp,GVWL); }
        SLELTI(cp,CHILD,NIL);
        kp = kp - 1;
        cp = DESCENDANT(D,LELTI(cp,INDX),kp);

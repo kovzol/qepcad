@@ -11,6 +11,20 @@ using namespace std;
 
 bool qfrFalseCheck(string qfrInputString);
 
+
+Word OBJCOMP(Word A, Word B)
+{
+  if (!ISLIST(A) || !ISLIST(B)) return signm(A-B);
+  if (ISNIL(A)) return ISNIL(B) ? 0 : -1;
+  if (ISNIL(B)) return 1;
+  Word t = OBJCOMP(FIRST(A),FIRST(B));
+  return t != 0 ? t : OBJCOMP(RED(A),RED(B));
+}
+
+/* simple database of facts */
+static GCWord* DBNVp = NULL;
+
+
 /*
 qfrCheckNonVanishing
 Inputs:
@@ -26,7 +40,24 @@ Outputs:
  */
 bool qfrCheckNonVanishing(BDigit r, Word P, Word A, Word F, Word V)
 {
+  static int numcalls = 0;
+  ++numcalls;
   if (PCVERBOSE) { SWRITE("qfr non-vanishing test: "); IPDWRITE(r,P,V); SWRITE("\n");  }
+
+
+  /* Experimental database code */
+  if (DBNVp == NULL) { DBNVp = new GCWord(); *DBNVp = NIL; }
+  SWRITE("## DBNV size = "); IWRITE(LENGTH(*DBNVp)); SWRITE(", numcalls = "); IWRITE(numcalls); SWRITE("\n");
+  Word newin = LIST4(r,P,A,F);
+  Word DBNVtmp = *DBNVp;
+  while(DBNVtmp != NIL)
+  {
+    Word next = FIRST(DBNVtmp);
+    if (OBJCOMP(FIRST(next),newin) == 0) break;
+    DBNVtmp = RED(DBNVtmp);
+  }
+  if (DBNVtmp != NIL) { SWRITE("***** We've answered this before! *****\n"); return SECOND(FIRST(DBNVtmp));}
+
 
 	 // Conjoin quantifier-free part of the input with assumptions and change level to r.
 	 Word tF = A == NIL  ? F : LIST3(ANDOP,A,F);
@@ -55,8 +86,13 @@ bool qfrCheckNonVanishing(BDigit r, Word P, Word A, Word F, Word V)
 	 // Check if tarski/qfr can deduce that this formula is false!
 	 int qfc = qfrFalseCheck(qfrInputString);
 	 if (PCVERBOSE) { cout << "QFR says: " << qfc << endl; }
+
+	 if (DBNVtmp == NIL) { *DBNVp = COMP(LIST2(newin,qfc),*DBNVp); }
 	 return qfc;
 }
+
+
+static GCWord* DBp = NULL;
 
 /*
 qfrCheckNonNullified
@@ -73,14 +109,27 @@ Outputs:
  */
 bool qfrCheckNonNullified(BDigit r, Word P, Word A, Word F, Word V)
 {
+  bool result;
+  
+  /* Experimental database code */
+  if (DBp == NULL) { DBp = new GCWord(); *DBp = NIL; }
+  SWRITE("## DB size = "); IWRITE(LENGTH(*DBp)); SWRITE("\n");
+  Word newin = LIST4(r,P,A,F);
+  Word DBtmp = *DBp;
+  while(DBtmp != NIL)
+  {
+    Word next = FIRST(DBtmp);
+    if (OBJCOMP(FIRST(next),newin) == 0) break;
+    DBtmp = RED(DBtmp);
+  }
+  if (DBtmp != NIL) { SWRITE("***** We've answered this before! *****\n"); }
+    
   if (PCVERBOSE) { SWRITE("non-nullified test: "); IPDWRITE(r,P,V); SWRITE("\n"); }
 
   // Get the system, and return if the system is trivially unsat or sat
-  Word S = COEFSYS(r,P);
-  if (S == 1) 
-    return true;
-  if (S == 0)
-    return false;
+  { Word S = COEFSYS(r,P);
+    if (S == 1) { result = true; goto Return; }
+    if (S == 0) { result = false; goto Return; }
 
   // Produce the formula version of the system
   Word Fp = NIL;
@@ -105,7 +154,13 @@ bool qfrCheckNonNullified(BDigit r, Word P, Word A, Word F, Word V)
 
   int qfc = qfrFalseCheck(qfrInputString);
   if (PCVERBOSE) { cout << "QFR says: " << qfc << endl; }
-  return qfc;
+  result =  qfc;
+  goto Return;
+  }
+
+  Return: /* process before returning! */
+  if (DBtmp == NIL) { *DBp = COMP(LIST2(newin,result),*DBp); }
+  return result;
 }
 
 bool qfrFalseCheck(string qfrInputString)
@@ -144,6 +199,6 @@ bool qfrFalseCheck(string qfrInputString)
     return true;
   else
     return false;
-#endif
+#endif // _MSC_VER
 }
 

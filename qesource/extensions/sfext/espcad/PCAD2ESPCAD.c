@@ -26,9 +26,7 @@ static Word LIST8(Word a1, Word a2, Word a3, Word a4, Word a5, Word a6, Word a7,
 Word PCAD2ESPCAD(Word P,Word Ps,Word Ds,Word A)
 {
        Word C,i,s,ss,P_i,Ps_i,S,Ss,c,EDs,T,t,Tp,u,v;
-
-	   // To satisfy Visual Studio Debugger.
-	   s = 0;
+       s = 0; // required on Windows
 
 Step1: /* Initialize. */
        C = LELTI(Ds,SC_REP);

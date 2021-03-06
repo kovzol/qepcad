@@ -1,9 +1,10 @@
 /*======================================================================
-                      t <- VERIFYCONSTSIGN(r,P,s)
+                      t <- VERIFYCONSTSIGN(r,P,s,A)
 
 Verify constant sign.
 
 Inputs
+ r : a BETA Digit
  P : an r-variate integral saclib poly with deg_{xr}(P) > 0
  s : 1 or 0
  A : the assumptions formula

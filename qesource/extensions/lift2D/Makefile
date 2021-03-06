@@ -21,6 +21,17 @@ endif
 #------------------
 ##################################################################
 
+ifeq ($(OS),Windows_NT)
+    ARFLAGS :=
+    else
+    UNAME_S := $(shell uname -s)
+    ifeq ($(UNAME_S),Linux)
+        ARFLAGS := crvU
+    endif
+    ifeq ($(UNAME_S),Darwin)
+        ARFLAGS := crv
+    endif
+endif
 
 INCLUDES  = \
 		-I${saclib}/include \

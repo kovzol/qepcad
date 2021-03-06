@@ -5,7 +5,7 @@ AFUPSFN with Database.
 ======================================================================*/
 #include "qepcad.h"
 
-Word AFUPSFNDB(Word M, Word B, Word *t_, Word *Bt_, Word *F_)
+void AFUPSFNDB(Word M, Word B, Word *t_, Word *Bt_, Word *F_)
 {
        Word t,Bt,F;
 
@@ -28,7 +28,4 @@ Return: /* Prepare for return. */
        *t_ = t;
        *Bt_ = Bt;
        *F_ = F;
-
-	   // Petter: What should be returned??
-	   return 0;
 }

@@ -30,7 +30,33 @@ Step2: /* Graph vertices. L is a list of all vert's in descending lex order. */
 Step3: /* Add edges. */
   S = LELTI(D,CHILD);
   if (LENGTH(S) < 3)
+  {
+    if (S != NIL)
+    {
+      Word c = FIRST(S);
+      Word S_c = LELTI(c,CHILD);
+      while(S_c != NIL && RED(S_c) != NIL)
+      {
+	Word c1 = FIRST(S_c), c2 = SECOND(S_c), c3 = THIRD(S_c);
+	if (LELTI(c1,TRUTH) == TRUE && LELTI(c3,TRUTH) == FALSE
+	    ||
+	    LELTI(c1,TRUTH) == FALSE && LELTI(c3,TRUTH) == TRUE)
+	{
+	  SLELTI(c2,TRUTH,TRUE);
+	  SLELTI(c2,HOWTV,TOPINF);
+	}
+	else if (LELTI(c1,TRUTH) == TRUE && LELTI(c3,TRUTH) == TRUE)
+	{
+	  SLELTI(c2,TRUTH,(LELTI(c2,TRUTH) == TRUE ? FALSE : TRUE));
+	  SLELTI(c2,HOWTV,TOPINF);
+	}
+	SLELTI(c1,TRUTH,FALSE); SLELTI(c1,HOWTV,TOPINF);
+	S_c = RED2(S_c);
+      }	
+      if (S_c != NIL) { SLELTI(FIRST(S_c),TRUTH,FALSE); SLELTI(FIRST(S_c),HOWTV,TOPINF); }
+    }
     goto StepX;
+  }
   
 Step4: /* Edges between cells in the same stack. */
   for(Sp = S; Sp != NIL; Sp = RED(Sp)) {

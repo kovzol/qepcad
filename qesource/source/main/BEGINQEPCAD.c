@@ -14,31 +14,31 @@ already been initialized!
 #include "db/convenientstreams.h"
 #include "db/CAPolicy.h"
 #include <ctype.h>
-
 #ifdef _MSC_VER
-	namespace
+namespace
 	{
-		bool isatty(int)
+	bool isatty(int)
 		{
-			return true;
+		return true;
 		}
 
-		bool WEXITSTATUS(int status)
+	bool WEXITSTATUS(int status)
 		{
-			return status == 0;
+		return status == 0;
 		}
 
-		template<typename F>
-		void setlinebuf(F)
+	template<typename F>
+	void setlinebuf(F)
 		{
 		}
 	}
 #else
-	#include <sys/wait.h>
+#include <sys/wait.h>
 #endif
 
 void QEPCAD_ProcessRC(int argc, char **argv);
 void QEPCAD_Usage(int cols);
+void setversline();
 
 /*
   This is a somewhat graceful way for me to work on experimental
@@ -50,6 +50,8 @@ ServerBase GVSB;
 CAPolicy *GVCAP = 0;
 QEPCADContext* GVContext = 0;
 
+int GVTIMEOUTLIMIT = -1;
+
 void BEGINQEPCAD(int &argc, char**& argv)
 {
   /* Process QEPCAD's command line arguments. 
@@ -60,31 +62,55 @@ void BEGINQEPCAD(int &argc, char**& argv)
   /* With an invalid command-line argument (or -h) just print usage 
      and exit*/
   int usageAndExit = -1; /* -1 means don't print usage and exit! */
-
+  int justExit = 0;
+  
   /* #cols for usage message output is 80 or terminal width if 
      stdout attached to a terminal*/
   int cols = 80;         /* number of columns for help output */
-  #ifndef _WIN32
-	  int isStdoutTerm = system("test -t 1");
-	  isStdoutTerm = WEXITSTATUS(isStdoutTerm);
-	  if (isStdoutTerm == 0 && isatty(0))
-	  {
-		int tmp = system("bash -c 'exit $(stty size | cut -d\" \" -f2)'");
-		tmp = WEXITSTATUS(tmp);
-		if (10 <= tmp <= 512)
-			cols = tmp;
-
-	  }
-  #endif
+#ifndef _MSC_VER
+  int isStdoutTerm = system("test -t 1");
+  isStdoutTerm = WEXITSTATUS(isStdoutTerm);
+  if (isStdoutTerm == 0 && isatty(0))
+  {
+    int tmp = system("bash -c 'exit $(stty size | cut -d\" \" -f2)'");
+    tmp = WEXITSTATUS(tmp);
+    if (10 <= tmp <= 512)
+      cols = tmp;
+  }
+#endif
 
   /* LOOP OVER ARGUMENTS! */
   for(int i = 1; i < argc; ++i)
   {
     if (strcmp(argv[i],"-exp") == 0) { experimentalExtensionFlag = 1; }
     else if (strcmp(argv[i],"-noecho") == 0) { NOECHOSWITCHSET = TRUE; }
+    else if (strcmp(argv[i],"-v") == 0)
+    {
+      SWRITE("QEPCAD   -"); setversline(); SWRITE("\n");
+      justExit = 1;
+    }
     else if (strcmp(argv[i],"-h") == 0)
     {
       usageAndExit = 0;
+    }
+    else if (strcmp(argv[i],"-t") == 0)
+    {
+      if (++i >= argc)
+      {	
+	cerr << "Missing time out (-t) argument!" << endl;
+	usageAndExit = 2;
+      }
+      else
+      {
+	int n = 0;
+	n = atoi(argv[i]);
+	if (n <= 0) 
+	{ 
+	  cerr << "Invalid time out (-t) argument '" << argv[i] << "'!"; 
+	  usageAndExit = 2;
+	}
+	GVTIMEOUTLIMIT = n;
+      }
     }
     else
     {
@@ -92,6 +118,7 @@ void BEGINQEPCAD(int &argc, char**& argv)
       usageAndExit = 1;
     }
   }
+  if (justExit) { exit(0); }
   if (usageAndExit >= 0) { QEPCAD_Usage(cols); exit(usageAndExit); }
 
   /* Set things up so Singular can be used as a CAServer */
@@ -122,18 +149,10 @@ void BEGINQEPCAD(int &argc, char**& argv)
 void QEPCAD_ProcessRC(int argc, char **argv)
 {
   char *qepath = getenv("qe");
-  if (qepath == NULL)
-  {
-	  static char current_path[] = ".";
-	  qepath = current_path;
-  }
-
+  if (qepath == NULL) { FAIL("QEPCAD_ProcessRC","Environment variable qe not defined!"); }
   string rcFileName = qepath + string("/default.qepcadrc");
   ifstream rcin(rcFileName.c_str());
-  if (!rcin) {
-	  std::cerr << "QEPCAD_ProcessRC: default.qepcadrc not found!" << std::endl;
-	  return;
-  }
+  if (!rcin) { return; }
   string name, tmp;
   while(rcin)
   {
@@ -150,7 +169,7 @@ void QEPCAD_ProcessRC(int argc, char **argv)
 void QEPCAD_Usage(int cols)
 {
       ostringstream out;
-      out << "usage: qepcad [-h] [-noecho] [+N<numcells>]\n\n";
+      out << "usage: qepcad [-h|-v] [-noecho] [-t <num>] [+N<numcells>]\n\n";
       out << "QEPCAD B v" << QEPCADBVersion();
       out << "\
  is a program for studying Cylindrical Algebraic Decomposition (CAD). \
@@ -160,10 +179,14 @@ simple equivalent Tarski formulas.\n\
 \n\
 Options\n\
 -h      : Help information\n\
+-v      : Print version string\n\
 -noecho : Turns off echoing of input\n\
+-t <num>: Sets a timeout of <num> seconds.\n\
 \n\
 Saclib options\n\
 +N<numcells> : Sets garbage collected space to <numcells>.  Default is 2000000.\n\
+               Maximum allowable is 1073741822 (Because \"Word\" is 32 bits).\n\
++h           : Prints Saclib help message.\n\
 ";
       int i = 0, x = 0;
       int N = int(out.str().length());

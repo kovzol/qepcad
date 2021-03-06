@@ -168,7 +168,9 @@ void QepcadCls::INITGLOBALS()
   PCSEARCHOK = 'n';
   PCSEARCHTRUE = 'n';
   PCSEARCHFALSE = 'n';
-  
+
+  PCTRACKUNSATCORE = FALSE;
+  GVPFASDPFLAG = FALSE;
 }
 
 void QepcadCls::INITSTATS()

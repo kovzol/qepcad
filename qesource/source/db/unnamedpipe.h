@@ -12,24 +12,22 @@
  ***************************************************************/
 #ifndef _UNNAMEDPIPE_
 #define _UNNAMEDPIPE_
+#include <cstdlib>
+#include <cstdio>
 
 #ifdef _MSC_VER
-
 #include <iostream>
-
 class UnnamedPipe
 {
 public:
   std::istream& in()  { return std::cin; }
   std::ostream& out() { return std::cout; }
 };
-
+#include <string.h>
 #else
 
-#include <cstdlib>
-#include <cstdio>
 #include <unistd.h>
-#include <string.h>
+#include <cstring>
 #include <iostream>
 #include <streambuf>
 using namespace std;
@@ -141,6 +139,5 @@ public:
   }
 };
 
-#endif
-
-#endif
+#endif // _MSC_VER
+#endif // _UNNAMEDPIPE_

@@ -15,20 +15,6 @@ Inputs
   Id1:
   Id2: The plot window is Id1 x Id2 pixels.
 ===========================================================================*/
-
-#ifdef _MSC_VER
-// PLOT_2D_CAD is not ported to Windows.
-#include "rend.h"
-
-void PLOT_2D_CAD(Word D, Word P, Word J, 
-		 Word Ix, Word IX, Word Iy, Word IY, Word e,
-		 Word Id1, Word Id2, QepcadCls &QC)
-{
-}
-
-#else
-
-
 extern "C" {
 #include <stdlib.h>
 #include <sys/types.h>
@@ -53,6 +39,10 @@ static void longtostring(long A, char* S);
 void PLOT_2D_CAD(Word D, Word P, Word J, 
 		 Word Ix, Word IX, Word Iy, Word IY, Word e,
 		 Word Id1, Word Id2, QepcadCls &QC)
+#ifdef _MSC_VER // PLOT_2D_CAD is not ported to Windows
+{
+}
+#else
 {
       char c;
       Word N;
@@ -225,5 +215,4 @@ static void longtostring(long A, char* S)
     S[i++] = '0';
   S[i] = '\0';
 }
-
-#endif  // _MSC_VER
+#endif // _MSC_VER

@@ -30,8 +30,25 @@ Step2: /* Graph vertices. L is a list of all vert's in descending lex order. */
 Step3: /* Add edges. */
   S = LELTI(D,CHILD);
   if (LENGTH(S) < 3)
+  {
+    if (S != NIL)
+    {
+      Word c = FIRST(S);
+      Word S_c = LELTI(c,CHILD);
+      while(S_c != NIL && RED(S_c) != NIL)
+      {
+	Word c1 = FIRST(S_c), c2 = SECOND(S_c), c3 = THIRD(S_c);
+	if (LELTI(c1,TRUTH) == TRUE || LELTI(c3,TRUTH) == TRUE)
+	{
+	  SLELTI(c2,TRUTH,TRUE);
+	  SLELTI(c2,HOWTV,TOPINF);
+	}
+	S_c = RED2(S_c);
+      }	
+    }
     goto StepX;
-  
+  }
+
 Step4: /* Edges between cells in the same stack. */
   for(Sp = S; Sp != NIL; Sp = RED(Sp)) {
     for(s = LELTI(FIRST(Sp),CHILD); s != NIL; s = RED(s)) {
@@ -80,6 +97,7 @@ Step10: /* Assign new TV's to CAD. */
 StepX: /* Assignments between 1D cells. 
   TVCLOSURE1D(D,P,J,3);
   CTVPROPUP(D,UNDET,GVNFV,TOPINF); */
+ 
 
 Return: /* Prepare to return. */
   return;

@@ -7,6 +7,7 @@ using namespace std;
 SingularServer::SingularServer(string SingularBase)
 {
   string SingularCall = SingularBase + "/Singular";
+
 #ifdef _MSC_VER
   std::cerr << "fork() not supported!" << std::endl;
   std::exit(1);
@@ -36,8 +37,8 @@ SingularServer::SingularServer(string SingularBase)
       outofSingular.closeOut();
       exit(0);
   }
-#endif
 }
+#endif // _MSC_VER
 
 SingularServer::~SingularServer()
 {
