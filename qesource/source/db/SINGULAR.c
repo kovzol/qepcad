@@ -37,8 +37,8 @@ SingularServer::SingularServer(string SingularBase)
       outofSingular.closeOut();
       exit(0);
   }
-}
 #endif // _MSC_VER
+}
 
 SingularServer::~SingularServer()
 {

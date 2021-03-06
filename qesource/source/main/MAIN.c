@@ -29,9 +29,9 @@ Step1: /* Set up the system. */
        init_SIGINT_handler(); /* A special handler for SIGINT is needed
                                  to shut down child processes. Also used
 			         for SIGTERM. */
-#endif
        if (GVTIMEOUTLIMIT > 0)
 	 sendSignalAfterInterval(GVTIMEOUTLIMIT,SIGALRM);
+#endif
 
 Step2: /* Read input, create CAD, write result */
        PCCONTINUE = FALSE;
@@ -83,11 +83,10 @@ static void init_SIGINT_handler()
   sigaction(SIGALRM,p,NULL);
   free(p);
 }
-#endif
 
 static int sendSignalAfterInterval(int seconds, int signum)
 {
-#if defined (_MSC_VER) || defined(__APPLE__) // Timer support is missing on Windows/Mac
+#ifdef __APPLE__
   return 1;
 #else
   /* Create timer */
@@ -109,8 +108,9 @@ static int sendSignalAfterInterval(int seconds, int signum)
     return 2;
 
   return 0;
-#endif
+#endif // __APPLE__
 }
+#endif // _MSC_VER
 
 int main(int argc, char **argv)
 {

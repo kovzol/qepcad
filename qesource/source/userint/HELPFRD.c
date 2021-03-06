@@ -16,28 +16,35 @@ extern char *Helps[];
 
 void HELPFRD()
 {
-       FILE *fp;
-       char *qepath;
-       char helppath[1000];  /* Should be enough. */
-       char buffer[MaxDescriptionSize]; 
-       char name[MaxCommandNameSize];
-       char location[MaxNumInteractionLocs];  
-       char classification[MaxNumInteractionLocs];  
-       unsigned int size;
-       char *p;
-       Word c;
-       Word  N,I,L,T,C,D;
-       int r1, r2, r3, r4, r5; /* fscanf return values. */
-  
+    FILE* fp;
+    char* qepath;
+    char helppath[1000];  /* Should be enough. */
+    char buffer[MaxDescriptionSize];
+    char name[MaxCommandNameSize];
+    char location[MaxNumInteractionLocs];
+    char classification[MaxNumInteractionLocs];
+    unsigned int size;
+    char* p;
+    Word c;
+    Word  N, I, L, T, C, D;
+    int r1, r2, r3, r4, r5; /* fscanf return values. */
+
 Step1: /* Open the text file containing the helps. */
-       if ((qepath = getenv("qe")) == NULL)
-          strcpy(helppath,HELPPATH);
-       else {
-          strcpy(helppath,qepath);
-          strcat(helppath,"/bin/qepcad.help"); }
+    if ((qepath = getenv("qe")) == NULL)
+        strcpy(helppath, HELPPATH);
+    else {
+        strcpy(helppath, qepath);
+#ifdef _MSC_VER
+        strcat(helppath, "\\bin\\qepcad.help");
+#else
+         strcat(helppath, "/bin/qepcad.help");
+#endif
+}
        if (!(fp = fopen(helppath,"r"))) {
          fprintf(stderr,"Error HELPFRD: Could not open %s\n",helppath);
-         exit(1); }
+         return;
+         // exit(1);
+       }
 
 Step2: /* Read in the main help text and echo it. */
        c = getc(fp);
