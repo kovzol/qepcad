@@ -42,8 +42,15 @@ EXTLIBS   =	${qe}/extensions/sfext/sfexto.a \
 		${qe}/extensions/adj2d/adj2do.a \
 		${qe}/extensions/rend/rendo.a \
 		${saclib}/lib/saclibo.a \
-		-lreadline -lrt \
-		${SPECLFLAGS}
+		-lreadline
+ifeq ($(OS),Windows_NT)
+else
+    UNAME_S := $(shell uname -s)
+    ifeq ($(UNAME_S),Linux)
+        EXTLIBS += -lrt
+    endif
+endif
+EXTLIBS += ${SPECLFLAGS}
 
 
 EXTLIBSD  =	${qe}/extensions/sfext/sfextd.a \
@@ -52,8 +59,15 @@ EXTLIBSD  =	${qe}/extensions/sfext/sfextd.a \
 		${qe}/extensions/adj2d/adj2dd.a \
 		${qe}/extensions/rend/rendd.a \
 		${saclib}/lib/saclibd.a \
-		-lreadline -lrt \
-		${SPECLFLAGS}
+		-lreadline
+ifeq ($(OS),Windows_NT)
+else
+    UNAME_S := $(shell uname -s)
+    ifeq ($(UNAME_S),Linux)
+        EXTLIBSD += -lrt
+    endif
+endif
+EXTLIBSD += ${SPECLFLAGS}
 
 NAME      =  qepcad
 LIB       =  $(NAME).a
