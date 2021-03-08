@@ -58,10 +58,8 @@ Outputs
 ===========================================================================*/
 #include "saclib.h"
 
-void NORMFCT(N,n,p,Q,Qp,q,B,L,T,G,C,e,d,k,N1,
-	     F_,Nb_,Bb_,Lb_,Tb_,Gb_,Cb_,Nb1_)
-       Word N,n,p,Q,Qp,q,B,L,T,G,C,e,d,k,N1,
-            *F_,*Nb_,*Bb_,*Lb_,*Tb_,*Gb_,*Cb_,*Nb1_;
+void NORMFCT(N,n,p,Q,Qp,q,B,L,T,G,C,e,d,k,N1,F_,Nb_,Bb_,Lb_,Tb_,Gb_,Cb_,Nb1_)
+       Word N,n,p,Q,Qp,q,B,L,T,G,C,e,d,k,N1,*F_,*Nb_,*Bb_,*Lb_,*Tb_,*Gb_,*Cb_,*Nb1_;
 {
        Word Bb,Cb,Ct,D,Db,F,Fb,Fp,F1,Gb,Gp,Gt,G1,G1t,Hb,H1,H1p,
             *I,Ib,Ib1,I1,J,K,

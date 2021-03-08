@@ -18,7 +18,7 @@ typedef int     Word;
 #define BETA2   0x10000000   /* BETA / 2 */
 
 /* Default values of several global variables. */
-#define NU_       100000000  /* 4 MB list space - 500000 list cells. */
+#define NU_       1000000  /* 4 MB list space - 500000 list cells. */
 #define NUp_      20000
 #define NSPRIME_  500
 #define NMPRIME_  2000
@@ -42,6 +42,16 @@ typedef int     Word;
 #else
 #define P__(A)  ()
 #endif
+
+/* Indicate that a function does not return. */
+#ifndef __noreturn
+# ifdef __GNUC__
+#  define __noreturn __attribute__ ((noreturn))
+# else
+#  define __noreturn
+# endif
+#endif
+
 
 
 #endif

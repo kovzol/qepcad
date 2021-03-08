@@ -25,7 +25,7 @@ void ARGSACLIB(argc,argv,ac_,av_)
        char ***av_;
 {
        Word gcm,nsprime,nmprime,nlprime,nu,nup,rho,nptr1;
-       int  ac,i,j;
+       int  ac,i;
        char **av;
 
 Step1: /* Store the default values of certain global variables. */ 
@@ -75,7 +75,10 @@ Step4: /* Set the global variables to their new values. */
        NMPRIME = nmprime;
        NLPRIME = nlprime;
        NPTR1 = nptr1;
-
+       if (NU > 1073741822 || NU < 20000) {
+	 FAIL("ARGSACLIB","+N option used with number outside range [20000,1073741822]!");
+       }
+       
 Return: /* Prepare for return. */
        *ac_ = ac;
        *av_ = av; 

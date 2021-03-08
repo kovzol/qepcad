@@ -15,7 +15,7 @@ Side effects
 #include "sactypes.h"
 extern GCArray *GCASPACEBp;
 
-void GCASET(A,i,a)  
+void GCASET(A,i,a)
      Word A,i,a;
 {
  GCASPACEBp[(A)].array[(i)] = (a);

@@ -37,10 +37,8 @@ Outputs
 ===========================================================================*/
 #include "saclib.h"
 
-void NORMLHS(q,Q,Qpp,Ab,Bb,Sb,Tb,Ap,Bp,Yp,Zp,U,D,A,B,
-	     Qs_,Y_,Z_,Us_,As_,Bs_)
-       Word q,Q,Qpp,Ab,Bb,Sb,Tb,Ap,Bp,Yp,Zp,U,D,A,B,
-            *Qs_,*Y_,*Z_,*Us_,*As_,*Bs_;
+void NORMLHS(q,Q,Qpp,Ab,Bb,Sb,Tb,Ap,Bp,Yp,Zp,U,D,A,B,Qs_,Y_,Z_,Us_,As_,Bs_)
+       Word q,Q,Qpp,Ab,Bb,Sb,Tb,Ap,Bp,Yp,Zp,U,D,A,B,*Qs_,*Y_,*Z_,*Us_,*As_,*Bs_;
 {
        Word As,At,Att,Bs,Qs,Us,Y,Z;
 
